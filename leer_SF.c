@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
     // Parte de información del mapa de bits.
 	MBinfo(SB);
 
+	printf("El tamaño de inodo deberia ser de %d.\n", T_INODO);
 	printf("Tamaño inodo -> %lu\n", sizeof(struct inodo));
 
     // Parte de información del array de inodos.

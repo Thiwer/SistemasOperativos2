@@ -377,10 +377,7 @@ int liberar_inodo(unsigned int ninodo){
 	return ninodo;
 }
 
-int liberar_bloques_inodo(unsigned int ninodo, unsigned int blogico){
-	
-	
-}
+
 
 //Funciones auxiliares de la cuarta etapa
 
@@ -438,6 +435,95 @@ unsigned int encontrarNivel(struct inodo Inodo, unsigned int blogico, int *ptr){
 }
 
 int vaciar_nivel(int level, int ptr, int primero, int blogico, int *bliberados){
-	
+	unsigned int buffer[BLOCKSIZE/sizeof(unsigned int)];
+	unsigned int bufferAux[BLOCKSIZE/sizeof(unsigned int)];
+	unsigned int bufferVacio[BLOCKSIZE/sizeof(unsigned int)];
+	memset(buffer, 0, sizeof(buffer));
+	memset(bufferAux, 0, sizeof(bufferAux));
+	memset(bufferVacio, 0, sizeof(bufferVacio));
+	if(ptr != 0){
+		if(level == 1){
+			bread(ptr, buffer);
+			int x;
+			
+			x = get_index(blogico, level);
+			
+			while(x < 256){
+				if(buffer[x] != 0){
+					bwrite(buffer[x], bufferVacio);
+					liberar_bloque(buffer[x]);
+					buffer[x] = 0;
+					(*bliberados)++;
+				}
+				x++;
+			}
+			bwrite(ptr, buffer);
+		}else{
+			bread(ptr, buffer);
+			int x;
+			x = get_index(blogico, level);
+			
+			level--;
+			while(x < 256){
+				if(buffer[x] != 0){
+					vaciar_nivel(level, buffer[x], primero, blogico, bliberados);
+					primero = 0;
+					bread(buffer[x], bufferAux);
+					if(memcmp(bufferAux, bufferVacio, sizeof(bufferAux)) == 0){
+						liberar_bloque(buffer[x]);
+						buffer[x] = 0;
+						(*bliberados)++;
+					}
+				}
+				x++;
+			}
+			bwrite(ptr, buffer);
+		}
+	}
+}
+
+int liberar_bloques_inodo(unsigned int ninodo, unsigned int blogico){
+//ninodo numero de inodo que accedemos i en blogio punto de aprtida para borrar 
+
+	struct inodo Inodo =leer_inodo(ninodo);
+	int ptr; 
+
+	int levelfinal = encontrarNivel(Inodo, blogico, &ptr);
+	int level = levelfinal;
+	int contBloquesliberados = 0;
+
+
+
+	unsigned int bufferAux[BLOCKSIZE/sizeof(unsigned int)];
+	unsigned int bufferVacio[BLOCKSIZE/sizeof(unsigned int)];
+	memset(bufferVacio, 0, sizeof(bufferVacio));
+
+	int i, j;
+	if(levelfinal == 0){
+		for(i = blogico; i < 12; i++){
+			if(Inodo.punterosDirectos[i] != 0){
+				liberar_bloque(Inodo.punterosDirectos[i]);
+				Inodo.punterosDirectos[i] = 0;
+				contBloquesliberados++;
+			}
+		}
+		level++;
+	}
+	for(j = level; j < 4; j++){
+		if(Inodo.punterosIndirectos[j-1] != 0){
+			
+			vaciar_nivel(j, Inodo.punterosIndirectos[j-1], 1, blogico, &contBloquesliberados);
+			bread(Inodo.punterosIndirectos[j-1], bufferAux);
+			if(memcmp(bufferAux, bufferVacio, sizeof(bufferAux)) == 0){
+				liberar_bloque(Inodo.punterosIndirectos[j-1]);
+				Inodo.punterosIndirectos[j-1] = 0;
+				contBloquesliberados++;
+			}
+		}
+	}
+	Inodo.numBloquesOcupados = Inodo.numBloquesOcupados - contBloquesliberados;
+	Inodo.ctime = time(NULL);
+	escribir_inodo(Inodo, ninodo);
+	return 0;
 	
 }

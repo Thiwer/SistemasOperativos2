@@ -40,7 +40,7 @@ unsigned int punterosDirectos[12]; //12 punteros a bloques directos
 unsigned int punterosIndirectos[3]; /*3 punteros a bloques indirectos:1 puntero indirecto simple, 1 puntero indirecto doble, 1 puntero indirecto triple */
 /* Utilizar una variable de alineación si es necesario para vuestra plataforma/compilador; 
 */
-char padding[T_INODO-2*sizeof(unsigned char)-3*sizeof(time_t)-18*sizeof(unsigned int)]; 
+char padding[T_INODO-2*sizeof(unsigned char)-3*sizeof(time_t)-20*sizeof(unsigned int)]; 
 // Hay que restar también lo que ocupen las variables de alineación utilizadas!!!
 };
 
