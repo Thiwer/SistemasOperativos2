@@ -161,7 +161,7 @@ int reservar_bloque(){
 	unsigned char bufferAux[BLOCKSIZE];
 	memset(bufferAux, 255, BLOCKSIZE);
 	int encontrado = 0;
-	int i = SB.posUltimoBloqueMB;
+	int i = SB.posPrimerBloqueMB;
 	int j;
 
 	int pos = 0;

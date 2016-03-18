@@ -1,7 +1,8 @@
 main: bloques.o ficheros.o mi_mkfs.o leer_SF.o ficheros_basico.o leer.o escribir.o escribir.o
+	gcc -o mi_mkfs bloques.o ficheros.o mi_mkfs.o ficheros_basico.o -g
 	gcc -o leer_SF leer_SF.o ficheros_basico.o ficheros.o bloques.o -g
 	gcc -o escribir escribir.o ficheros_basico.o ficheros.o bloques.o -g
-	gcc  -o leer leer.o ficheros_basico.o ficheros.o bloques.o -g
+	gcc -o leer leer.o ficheros_basico.o ficheros.o bloques.o -g
 	
 leer: leer.o ficheros_basico.o ficheros.o bloques.o
 	gcc -o leer leer.o ficheros_basico.o ficheros.o bloques.o -g 
