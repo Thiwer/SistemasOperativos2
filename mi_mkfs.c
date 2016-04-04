@@ -10,6 +10,7 @@ int main(int argc, char **argv) {
 
 	if(argc != 3){
 		printf("Faltan argumentos\n");
+		return -1;
 	}
 
 	int nbloques = atoi(argv[2]);
@@ -31,27 +32,33 @@ int main(int argc, char **argv) {
 	printf("Iniciando superbloque...\n");
 	if(initSB(nbloques, ninodos) < 0){
 		printf("Error al iniciar el superbloque\n");
+		return -1;
 	}
 	
 	printf("Iniciando mapa de bits...\n");
 	if(initMB(nbloques) < 0){
 		printf("Error al iniciar el mapa de bits\n");
+		return -1;
 	}
 
 	printf("Iniciando array de inodos...\n");
 	if(initAI(ninodos) < 0){
 		printf("Error al iniciar el array de inodos\n");
+		return -1;
 	}
 	
 	printf("Creando directorio raíz...\n");
 	int raiz = reservar_inodo('d', '7');
 	if(raiz < 0){
 		printf("Error al crear el directorio raíz\n");
+		return -1;
 	}
 	
 	
 	printf("Desmontando dispositivo...\n");
 	bumount();
 	printf("Se ha desmontado el dispositivo\n");
+
 	return 0;
+
 }

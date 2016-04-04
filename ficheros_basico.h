@@ -67,6 +67,6 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int blogico, unsigned ch
 int liberar_inodo(unsigned int ninodo);
 int liberar_bloques_inodo(unsigned int ninodo, unsigned int blogico);
 
-unsigned int encontrarNivel(struct inodo Inodo, unsigned int blogico, int *ptr);
-int get_index(unsigned int blogico, unsigned int level);
-int vaciar_nivel(int level, int ptr, int primero, int blogico, int *bliberados);
+unsigned int obtenerRangoBL(struct inodo Inodo, unsigned int blogico, int *ptr);
+int obtenerIndice(unsigned int blogico, unsigned int level);
+int vaciar_nivel(int level, int ptr, int primero, int blogico, int *bliberados); //funcion recursiva
