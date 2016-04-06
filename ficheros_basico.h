@@ -3,8 +3,8 @@
 //#include <string.h>
 #include "bloques.h"
 
-#define posSB 0 //el superbloque se escribe en el primer bloque de nuestro FS
-#define T_INODO 128 //tamaño en bytes de un inodo
+#define posSB 0
+#define T_INODO 128
 
 struct superbloque{
 unsigned int posPrimerBloqueMB; //Posición del primer bloque del mapa de bits 
@@ -19,14 +19,12 @@ unsigned int cantBloquesLibres; //Cantidad de bloques libres
 unsigned int cantInodosLibres; //Cantidad de inodos libres 
 unsigned int totBloques; //Cantidad total de bloques 
 unsigned int totInodos; //Cantidad total de inodos 
-char padding[BLOCKSIZE-12*sizeof(unsigned int)]; //Relleno
+char padding[BLOCKSIZE-12*sizeof(unsigned int)];
 };
 
-struct inodo{ //sizeof(inodo)!!!
+struct inodo{
 unsigned char tipo; //Tipo (libre, directorio o fichero)
 unsigned char permisos; //Permisos (lectura y/o escritura y/o ejecución)
-/* Por cuestiones internas de alineación de estructuras, si se está utilizando un tamaño de palabra de 4 bytes (microprocesadores de 32 bits): unsigned char reservado_alineacion1 [2]; 
-en caso de que la palabra utilizada sea del tamaño de 8 bytes (microprocesadores de 64 bits): unsigned char reservado_alineacion1 [6]; */
 
 time_t atime; //Fecha y hora del último acceso a datos: atime
 time_t mtime; //Fecha y hora de la última modificación de datos: mtime
@@ -41,32 +39,23 @@ unsigned int punterosIndirectos[3]; /*3 punteros a bloques indirectos:1 puntero 
 /* Utilizar una variable de alineación si es necesario para vuestra plataforma/compilador; 
 */
 char padding[T_INODO-2*sizeof(unsigned char)-3*sizeof(time_t)-20*sizeof(unsigned int)]; 
-// Hay que restar también lo que ocupen las variables de alineación utilizadas!!!
 };
 
-
-//etapa 2
 int tamMB(unsigned int nbloques);
 int tamAI(unsigned int ninodos);
 int initSB(unsigned int nbloques, unsigned int ninodos);
 int initMB(unsigned int nbloques);
 int initAI();
-
-//etapa 3
 int escribir_bit(unsigned int nbloque, unsigned int bit);
 unsigned char leer_bit(unsigned int nbloque);
-
 int reservar_bloque();
 int liberar_bloque(unsigned int nbloque);
 int escribir_inodo(struct inodo Inodo, unsigned int ninodo);
 struct inodo leer_inodo(unsigned int ninodo);
 int reservar_inodo(unsigned char tipo, unsigned char permisos);
-
-//etapa 4
 int traducir_bloque_inodo(unsigned int ninodo, unsigned int blogico, unsigned char reservar);
 int liberar_inodo(unsigned int ninodo);
 int liberar_bloques_inodo(unsigned int ninodo, unsigned int blogico);
-
 unsigned int obtenerRangoBL(struct inodo Inodo, unsigned int blogico, int *ptr);
 int obtenerIndice(unsigned int blogico, unsigned int level);
 int vaciar_nivel(int level, int ptr, int primero, int blogico, int *bliberados); //funcion recursiva

@@ -3,9 +3,9 @@
 int main(int argc, char **argv) {
 
 	/* 
-	argv[0]="mi_mkfs"
-	argv[1]=nombre_fichero
-	argv[2]=cantidad_bloques
+	argv[0]= "mi_mkfs"
+	argv[1]= nombre del fichero
+	argv[2]= cantidad de bloques
 	*/
 
 	if(argc != 3){
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
 	unsigned char buffer[BLOCKSIZE];
 	memset(buffer, 0, BLOCKSIZE);
-	bmount(argv[1]); // Monta el dispositivo
+	bmount(argv[1]);
 
 	printf("Se ha montado el dispositivo\n");
 
@@ -54,11 +54,9 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 	
-	
 	printf("Desmontando dispositivo...\n");
 	bumount();
 	printf("Se ha desmontado el dispositivo\n");
 
 	return 0;
-
 }
