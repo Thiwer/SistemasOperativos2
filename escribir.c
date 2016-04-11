@@ -9,9 +9,9 @@ int main(int argc, const char * argv[]){
     printf("\t- Reserva inodo: %d\n", ninodo);
     
     mi_write_f(ninodo, text, 409604096, strlen(text));
-    //mi_write_f(ninodo, text, 256000, 26);
-    //mi_write_f(ninodo, text, 30721024, 27);
-    //mi_write_f(ninodo, text, 71680000, 25);
+    //mi_write_f(ninodo, text, 256000, strlen(text));
+    //mi_write_f(ninodo, text, 30721024, strlen(text));
+    //mi_write_f(ninodo, text, 71680000, strlen(text));
 
     bumount();
     return ninodo;

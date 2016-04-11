@@ -9,15 +9,14 @@ int main(int argc, char **argv) {
 
     int i = 0;
     int leido = 0;
-    int total = 0;
     printf("Leyendo archivo\n");
  
     while ((leido = mi_read_f(ninodo, buffer, i * BLOCKSIZE, BLOCKSIZE)) > 0) {
         printf("%s", buffer);
         memset(buffer,0,BLOCKSIZE);
-        total = total + leido;
         i++;
     }
+    printf("\n");
 
     if (leido == -1) {
         printf("No existe el fichero");

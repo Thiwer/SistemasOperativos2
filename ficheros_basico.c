@@ -246,7 +246,7 @@ int reservar_inodo(unsigned char tipo, unsigned char permisos){
 }
 
 int traducir_bloque_inodo(unsigned int ninodo, unsigned int blogico, unsigned char reservar){
-	//---------------------------------------------------------------------------------------
+
 	struct inodo Inodo = leer_inodo(ninodo);
 	int ptr = 0;
 	int ptrPre = 0; //puntero precedente
@@ -354,7 +354,7 @@ int obtenerIndice(unsigned int blogico, unsigned int nivel){
 }
 
 int vaciar_nivel(int nivel, int ptr, int primero, int blogico, int *bliberados){ //funcion recursiva de liberar bloques inodo
-	//--------------------------------------------------------------------------
+	
 	unsigned int buffer[BLOCKSIZE/sizeof(unsigned int)];
 	memset(buffer, 0, sizeof(buffer));
 
@@ -365,7 +365,7 @@ int vaciar_nivel(int nivel, int ptr, int primero, int blogico, int *bliberados){
 	memset(vacio, 0, sizeof(vacio));
 
 	if(ptr != 0){
-		if(nivel == 1){
+		if(nivel == 1){ // ultimo nivel
 			bread(ptr, buffer);
 			int x;
 			x = obtenerIndice(blogico, nivel);
@@ -379,7 +379,7 @@ int vaciar_nivel(int nivel, int ptr, int primero, int blogico, int *bliberados){
 				x++;
 			}
 			bwrite(ptr, buffer);
-		}else{
+		}else{ //nivel intermedio
 			bread(ptr, buffer);
 			int x;
 			if(primero == 1){
@@ -424,7 +424,6 @@ int liberar_inodo(unsigned int ninodo){
 }
 
 int liberar_bloques_inodo(unsigned int ninodo, unsigned int blogico){
-	//--------------------------------------------------------------
 	struct inodo Inodo = leer_inodo(ninodo);
 	int ptr;
 	int liberados = 0;

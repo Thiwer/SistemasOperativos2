@@ -31,7 +31,6 @@ int mi_write_f(unsigned int ninodo, const void *buf_original, unsigned int offse
 		memset(bufBloque, 0, sizeof(bufBloque));
 		int desp1 = offset%BLOCKSIZE;
 		int bFisico = traducir_bloque_inodo(ninodo, primerLogico, 1); //reserva del bloque fisico
-		printf("---%d---\n", bFisico);
 		if(bFisico < 0) return bytesEscritos;
 		if(bread(bFisico, bufBloque) < 0) return -1;
 		memcpy(bufBloque+desp1, buf_original, BLOCKSIZE-desp1);
