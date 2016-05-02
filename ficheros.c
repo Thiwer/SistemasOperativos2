@@ -147,3 +147,113 @@ int mi_read_f(unsigned int ninodo, void *buf, unsigned int offset, unsigned int 
 		} 
 	return bytesleidos;
 }
+
+int mi_chmod_f(unsigned int ninodo, unsigned char modo) {
+    // Creamos una estructura inodo.
+	struct inodo Inodo;
+    // Leemos el inodo indicado.
+	Inodo = leer_inodo(ninodo);
+    // Cambiamos los permisos del inodo.
+	Inodo.permisos = modo;
+    // Modificamos la variable ctime.
+	Inodo.ctime = time(NULL);
+    // Actualizamos el inodo.
+	escribir_inodo(Inodo, ninodo);
+}
+
+
+int mi_truncar_f(unsigned int ninodo, unsigned int nbytes) {
+    // Creamos una estructura inodo.
+	struct inodo Inodo;
+    // Leemos el inodo indicado por parámetro.
+	Inodo = leer_inodo(ninodo);
+
+	if (nbytes > Inodo.tamEnBytesLog) {
+		printf("ERROR -> No se ha podido truncar el fichero por sobrepasar su tamaño.\n");
+		return -1;
+	}
+
+    // Si el número de bytes es 0, vaciamos el fichero.
+	if (nbytes == 0) {
+		liberar_inodo(ninodo);
+
+		Inodo.tamEnBytesLog = nbytes;
+
+		if (escribir_inodo(Inodo, ninodo) == -1) {
+			return -1;
+		}
+    }// Si no...
+    else if (nbytes > 0) {
+        // Calculamos el último bloque a truncar.
+    	int ultimoblogico = Inodo.tamEnBytesLog / BLOCKSIZE;
+
+        // Si el tamaño en bytes lógicos del inodo es múltiplo del tamaño de bloque
+        // decrementamos la variable ultimoblogico.
+    	if ((Inodo.tamEnBytesLog % BLOCKSIZE) == 0) {
+    		ultimoblogico--;
+    	}
+
+        // Calculamos el último bloque que conservamos.
+    	int bloq_queda = nbytes / BLOCKSIZE;
+        // Si el número de bytes es múltiplo de tamaño de bloque, decrementamos 
+        // la variable bloq_queda.
+    	if (nbytes % BLOCKSIZE == 0) {
+    		bloq_queda--;
+    	}
+
+    	unsigned int bfisico;
+    	int i = 0;
+    	char reservar = '0';
+        // Iteramos para todos los bloques que queremos liberar.
+    	for (i = bloq_queda + 1; i <= ultimoblogico; i++) {
+            // Obtenemos el bloque físico.
+    		bfisico = traducir_bloque_inodo(ninodo, i, reservar);
+
+            // Si no es el bloque raíz (SUPERBLOQUE)...
+    		if (bfisico > 0) {
+    			if (liberar_bloque(bfisico) == -1) {
+
+    				printf("ERROR -> No se ha liberado el bloque.\n");
+    				return -1;
+    			}
+                // Decrementamos los bloques ocupados.
+    			Inodo.numBloquesOcupados--;
+    		}
+
+            // Si estamos en el último bloque y no ocupa el bloque entero...
+    		if ((i == ultimoblogico) && (Inodo.tamEnBytesLog % BLOCKSIZE != 0)) {
+                // Truncamos el trozo del bloque.
+    			Inodo.tamEnBytesLog = Inodo.tamEnBytesLog - (Inodo.tamEnBytesLog % BLOCKSIZE);
+    		} else {
+                // Truncamos todo el bloque.
+    			Inodo.tamEnBytesLog = Inodo.tamEnBytesLog - BLOCKSIZE;
+    		}
+    	}
+
+    	Inodo.tamEnBytesLog = nbytes;
+
+    	if (escribir_inodo(Inodo, ninodo) == -1) {
+    		return -1;
+    	}
+    }
+    return 0;
+}
+int mi_stat_f(unsigned int ninodo, struct STAT *p_stat) {
+    // Creamos una estructura inodo.
+	struct inodo Inodo;
+	struct STAT stat;
+    // Leemos el inodo indicado por parámetro.
+	Inodo = leer_inodo(ninodo);
+    // Asignamos información a la estructura STAT.
+	stat.tipo = Inodo.tipo;
+	stat.tamEnBytesLog = Inodo.tamEnBytesLog;
+	stat.permisos = Inodo.permisos;
+	stat.numBloquesOcupados = Inodo.numBloquesOcupados;
+	stat.nlinks = Inodo.nlinks;
+	stat.mtime = Inodo.mtime;
+	stat.ctime = Inodo.ctime;
+	stat.atime = Inodo.atime;
+
+	*p_stat = stat;
+
+}
