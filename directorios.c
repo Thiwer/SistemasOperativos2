@@ -292,6 +292,55 @@ int mi_dir(const char *camino, char *buffer){
 
 int mi_link(const char *camino1, const char *camino2){
 
+	int p_inodo_dir = 0;
+	int p_inodo = 0;
+	int p_entrada = 0;
+	//comprobar permisos
+	int resultado = buscar_entrada(camino, p_inodo_dir, p_inodo, p_entrada, 1, permisos);
+	if ( resultado < 0)
+	{
+		error(resultado);
+		printf("Error en mi_link\n");
+		return -1;
+	}
+	int ninodo = p_inodo; //simple notacion
+	struct inodo Inodo= leer_inodo(ninodo);
+	if (Inodo.tipo != 'f')
+	{
+		printf("El inodo no es u fichero, no se puede linkar\n"); //para no permitir ciclos infinitos
+		return -1;
+	}
+	struct entrada entrada;
+
+	//reset de variables
+	p_inodo_dir = 0;
+	p_inodo = 0;
+	p_entrada = 0;
+	resultado = buscar_entrada(camino, p_inodo_dir, p_inodo, p_entrada, 1, permisos);
+	if ( resultado < 0) //miramos que no exista
+	{
+		error(resultado);
+		printf("Error en mi_link_2\n");
+		return -1;
+	}
+	//lectura de la entrada creada
+	mi_read_f(p_inodo_dir, &entrada, p_entrada*sizeof(struct entrada), sizeof(struct entrada));
+	//liberacion de su inodo
+	liberar_inodo(entrada.inodo);
+	//enlaze
+	entrada.inodo = ninodo;
+
+	//escritura de la entrada modificada
+	mi_write_f(p_inodo_dir, &entrada, p_entrada*sizeof(struct entrada), sizeof (struct entrada));
+
+	//datos del inodo
+	Inodo = leer_inodo(ninodo);
+	Inodo.nlinks++;
+	Inodo.ctime = time(NULL);
+	escribir_inodo(Inodo, ninodo);
+	return 0;
+
+
 }
 
 int mi_unlink(const char *camino){
